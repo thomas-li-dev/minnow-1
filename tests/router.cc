@@ -281,6 +281,19 @@ void network_simulator()
     network.host( "cherrypie" ).expect( dgram_sent );
     network.simulate();
   }
+  cout << green
+       << "\n\nTesting traffic (multiple datagrams) between two ordinary hosts (applesauce to cherrypie)..."
+       << normal << "\n\n";
+  {
+    const int NUM_TO_SEND = 2;
+    for ( int i = 0; i < NUM_TO_SEND; i++ ) {
+      auto dgram_sent = network.host( "applesauce" ).send_to( network.host( "cherrypie" ).address() );
+      dgram_sent.header.ttl--;
+      dgram_sent.header.compute_checksum();
+      network.host( "cherrypie" ).expect( dgram_sent );
+    }
+    network.simulate();
+  }
 
   cout << green << "\n\nTesting traffic between two ordinary hosts (cherrypie to applesauce)..." << normal
        << "\n\n";
